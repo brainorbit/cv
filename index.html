@@ -1839,7 +1839,21 @@
             setTimeout(() => fitPageToFrame("finalFrame", "cvFinal", getContainerSize("final-stage", 32)), 80);
         };
         document.getElementById("finalEdit").onclick = () => show("formScreen");
-        document.getElementById("downloadBtn").onclick = () => window.print();
+
+        // ---- Download PDF with dynamic filename ----
+        document.getElementById("downloadBtn").onclick = function() {
+            const name = state.name.trim();
+            const baseName = name ? `cvof${name}` : 'cv';
+            // Set document title to influence the default PDF filename
+            const originalTitle = document.title;
+            document.title = baseName;
+            // Print (the browser will use the title for the PDF filename)
+            window.print();
+            // Restore original title after a short delay (the print dialog is modal)
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 1000);
+        };
 
         document.getElementById("photoSwitch").onclick = () => { state.photoEnabled = !state.photoEnabled;
             syncPhotoUI();
