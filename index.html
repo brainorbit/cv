@@ -492,6 +492,55 @@
             padding: 0
         }
 
+        /* Education fields – labels with pencil, no delete button */
+        .edu-field-group {
+            margin-bottom: 8px;
+        }
+        .edu-field-group:last-child {
+            margin-bottom: 0;
+        }
+        .edu-field-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10.5px;
+            color: #657284;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .045em;
+            margin-bottom: 3px;
+        }
+        .edu-field-label .pencil {
+            cursor: pointer;
+            color: #8a9aa8;
+            font-size: 12px;
+            margin-left: 2px;
+        }
+        .edu-field-label .pencil:hover {
+            color: var(--navy);
+        }
+        .edu-field-label .label-edit-input {
+            width: auto;
+            min-width: 60px;
+            padding: 2px 4px;
+            font-size: 10px;
+            border: 1px dashed #b0c0d0;
+            border-radius: 4px;
+            background: #fff;
+            text-transform: uppercase;
+        }
+        .edu-field-label .label-text {
+            cursor: default;
+        }
+        .edu-field-row .value-input {
+            width: 100%;
+            padding: 6px 8px;
+            font-size: 12px;
+            border: 1px solid #d5dce5;
+            border-radius: 9px;
+            background: #fff;
+        }
+
         /* Preview */
         .preview-head {
             display: flex;
@@ -664,6 +713,29 @@
             gap: 12px;
             font-size: calc(9.5px * var(--s));
             line-height: 1.3
+        }
+        .cv-meta .left-fields {
+            display: flex;
+            flex-direction: column;
+            gap: calc(2px * var(--s));
+        }
+        .cv-meta .right-fields {
+            white-space: nowrap;
+            text-align: right;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .cv-meta .field-item {
+            display: flex;
+            gap: 4px;
+        }
+        .cv-meta .field-item .field-label {
+            font-weight: 600;
+            color: #2c3846;
         }
         .cv-skill {
             padding-left: 14px
@@ -1252,14 +1324,47 @@
             phone: "",
             email: "",
             location: "",
-            objective: "",
-            education: [],
-            skills: [],
-            personal: [],
-            languages: [],
+            objective: "Motivated and responsible Honours student seeking an opportunity in a reputable organization where I can apply my analytical, communication, organizational, and problem-solving skills, contribute effectively to the organization, and develop my professional career.",
+            education: [{
+                degree: "B.Sc. (Honours) in Mathematics — 2nd Year",
+                school: "",
+                leftFields: [{ label: "Group/Subject", value: "" }],
+                rightFields: [{ label: "Status", value: "" }]
+            }, {
+                degree: "Higher Secondary Certificate (HSC)",
+                school: "",
+                leftFields: [{ label: "Group", value: "" }],
+                rightFields: [{ label: "Passing Year", value: "" }, { label: "GPA", value: "" }]
+            }, {
+                degree: "Secondary School Certificate (SSC)",
+                school: "",
+                leftFields: [{ label: "Group", value: "" }],
+                rightFields: [{ label: "Passing Year", value: "" }, { label: "GPA", value: "" }]
+            }],
+            skills: [
+                "Microsoft Office: Proficient in MS Word (report writing) and MS Excel (data entry and tables).",
+                "Computer Skills: MS Word, MS Excel, email communication, internet research, and online documentation.",
+                "Management: Ability to organize team activities and manage schedules.",
+                "Communication: Excellent verbal and written communication skills in Bengali and English.",
+                "Adaptability: Quick to learn new tasks, tools, and working procedures."
+            ],
+            personal: [
+                ["Father's Name", ""],
+                ["Mother's Name", ""],
+                ["Date of Birth", ""],
+                ["Religion", ""],
+                ["Marital Status", ""],
+                ["Nationality", ""],
+                ["Present Address", ""],
+                ["Permanent Address", ""]
+            ],
+            languages: [
+                { name: "Bengali", reading: "Excellent", writing: "Excellent", speaking: "Excellent" },
+                { name: "English", reading: "Good", writing: "Good", speaking: "Good" }
+            ],
             reference: "",
             custom: [],
-            declaration: "",
+            declaration: "I hereby declare that the details furnished above are true and correct to the best of my knowledge and belief.",
             photoEnabled: false,
             photoData: null
         };
@@ -1327,10 +1432,32 @@
  ${has(state.phone)?`<span>☎ ${esc(state.phone)}</span>`:""}${has(state.email)?`<span>✉ ${esc(state.email)}</span>`:""}${has(state.location)?`<span>⌖ ${esc(state.location)}</span>`:""}
  </div></div><div class="cv-photo-slot">${photoHtml}</div></header><div class="cv-divider"></div>`;
             if (has(state.objective)) h += cvSection("CAREER OBJECTIVE", "objective", `<p>${esc(state.objective)}</p>`);
-            const ed = state.education.filter(e => has(e.degree) || has(e.school) || has(e.left) || has(e.right));
-            if (ed.length) h += cvSection("ACADEMIC QUALIFICATIONS", "education", ed.map(e =>
-                `<article class="cv-edu">${has(e.degree)?`<h3 class="cv-degree">${esc(e.degree)}</h3>`:""}${has(e.school)?`<p class="cv-school">${esc(e.school)}</p>`:""}${has(e.left)||has(e.right)?`<div class="cv-meta"><span>${esc(e.left)}</span><span>${esc(e.right)}</span></div>`:""}</article>`
-                ).join(""));
+
+            // Education
+            const ed = state.education.filter(e => has(e.degree) || has(e.school) || e.leftFields.some(f => has(f.value)) || e
+                .rightFields.some(f => has(f.value)));
+            if (ed.length) {
+                const edHtml = ed.map(e => {
+                    // Left fields: each on its own line
+                    let leftHtml = e.leftFields.filter(f => has(f.label) || has(f.value))
+                        .map(f => `<div class="field-item"><span class="field-label">${esc(f.label)}:</span> ${esc(f.value)}</div>`)
+                        .join("");
+                    // Right fields: combined into a single line with " | "
+                    const rightItems = e.rightFields.filter(f => has(f.label) || has(f.value))
+                        .map(f => `<span><span class="field-label">${esc(f.label)}</span>: ${esc(f.value)}</span>`);
+                    let rightHtml = rightItems.length ? rightItems.join(' | ') : '';
+                    return `<article class="cv-edu">
+                                ${has(e.degree)?`<h3 class="cv-degree">${esc(e.degree)}</h3>`:""}
+                                ${has(e.school)?`<p class="cv-school">${esc(e.school)}</p>`:""}
+                                <div class="cv-meta">
+                                    <div class="left-fields">${leftHtml}</div>
+                                    <div class="right-fields">${rightHtml}</div>
+                                </div>
+                            </article>`;
+                }).join("");
+                h += cvSection("ACADEMIC QUALIFICATIONS", "education", edHtml);
+            }
+
             const sk = state.skills.filter(has);
             if (sk.length) h += cvSection("KEY SKILLS & STRENGTHS", "skills",
                 `<div class="cv-skill"><ul>${sk.map(x=>{const i=x.indexOf(":");return i>-1?`<li><strong>${esc(x.slice(0,i+1))}</strong>${esc(x.slice(i+1))}</li>`:`<li>${esc(x)}</li>`}).join("")}</ul></div>`
@@ -1462,26 +1589,128 @@
             renderPreview();
         }
 
+        // ---------- Education rendering (no delete buttons) ----------
         function renderEducation() {
             const box = document.getElementById("educationList");
             box.innerHTML = "";
-            state.education.forEach((e, i) => {
+            state.education.forEach((e, idx) => {
                 const d = document.createElement("div");
                 d.className = "repeat";
-                d.innerHTML = `<div class="repeat-head"><strong>Education ${i+1}</strong><button class="remove">✕</button></div>
-   <div class="field"><label>Qualification</label><input data-k="degree" value="${esc(e.degree)}"></div>
-   <div class="field"><label>Institution / Board</label><input data-k="school" value="${esc(e.school)}"></div>
-   <div class="row2"><div class="field"><label>Left detail</label><input data-k="left" value="${esc(e.left)}"></div><div class="field"><label>Right detail</label><input data-k="right" value="${esc(e.right)}"></div></div>`;
-                d.querySelectorAll("input").forEach(x => x.oninput = () => { e[x.dataset.k] = x.value;
-                    renderPreview();
-                    save() });
-                d.querySelector(".remove").onclick = () => { state.education.splice(i, 1);
-                    rerenderForm();
-                    save() };
+                d.innerHTML = `<div class="repeat-head"><strong>Education ${idx+1}</strong><button class="remove">✕</button></div>
+                    <div class="field"><label>Qualification</label><input class="edu-degree" value="${esc(e.degree)}"></div>
+                    <div class="field"><label>Institution / Board</label><input class="edu-school" value="${esc(e.school)}"></div>
+                    <div class="row2">
+                        <div class="edu-left">
+                            <div class="edu-left-fields"></div>
+                        </div>
+                        <div class="edu-right">
+                            <div class="edu-right-fields"></div>
+                        </div>
+                    </div>`;
                 box.appendChild(d);
+
+                const leftContainer = d.querySelector('.edu-left-fields');
+                const rightContainer = d.querySelector('.edu-right-fields');
+
+                function renderFieldGroup(container, fields) {
+                    container.innerHTML = '';
+                    fields.forEach((f) => {
+                        const group = document.createElement('div');
+                        group.className = 'edu-field-group';
+
+                        // Label row with pencil
+                        const labelDiv = document.createElement('div');
+                        labelDiv.className = 'edu-field-label';
+                        const labelText = document.createElement('span');
+                        labelText.className = 'label-text';
+                        labelText.textContent = f.label || 'Label';
+                        const pencil = document.createElement('span');
+                        pencil.className = 'pencil';
+                        pencil.textContent = '✎';
+                        pencil.title = 'Edit label';
+                        labelDiv.appendChild(labelText);
+                        labelDiv.appendChild(pencil);
+
+                        // Pencil click -> edit label
+                        pencil.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const currentLabel = labelText.textContent;
+                            const inp = document.createElement('input');
+                            inp.type = 'text';
+                            inp.value = currentLabel;
+                            inp.className = 'label-edit-input';
+                            inp.style.width = 'auto';
+                            inp.style.minWidth = '60px';
+                            inp.style.padding = '2px 4px';
+                            inp.style.fontSize = '10px';
+                            inp.style.border = '1px dashed #b0c0d0';
+                            inp.style.borderRadius = '4px';
+                            inp.style.background = '#fff';
+                            inp.style.textTransform = 'uppercase';
+                            labelDiv.innerHTML = '';
+                            labelDiv.appendChild(inp);
+                            inp.focus();
+                            inp.select();
+                            const done = () => {
+                                const newLabel = inp.value.trim() || 'Label';
+                                f.label = newLabel;
+                                renderEducation();
+                                renderPreview();
+                                save();
+                            };
+                            inp.addEventListener('blur', done);
+                            inp.addEventListener('keydown', function(ev) {
+                                if (ev.key === 'Enter') { ev.preventDefault();
+                                    inp.blur(); }
+                            });
+                        });
+
+                        // Value input (no remove button)
+                        const valueInput = document.createElement('input');
+                        valueInput.type = 'text';
+                        valueInput.className = 'value-input';
+                        valueInput.value = f.value || '';
+                        valueInput.placeholder = 'Value';
+                        valueInput.addEventListener('input', function() {
+                            f.value = this.value;
+                            renderPreview();
+                            save();
+                        });
+
+                        group.appendChild(labelDiv);
+                        group.appendChild(valueInput);
+
+                        container.appendChild(group);
+                    });
+                }
+
+                renderFieldGroup(leftContainer, e.leftFields);
+                renderFieldGroup(rightContainer, e.rightFields);
+
+                // Degree and school inputs
+                const degreeInput = d.querySelector('.edu-degree');
+                degreeInput.addEventListener('input', function() {
+                    e.degree = this.value;
+                    renderPreview();
+                    save();
+                });
+                const schoolInput = d.querySelector('.edu-school');
+                schoolInput.addEventListener('input', function() {
+                    e.school = this.value;
+                    renderPreview();
+                    save();
+                });
+
+                // Remove education entry (whole)
+                d.querySelector('.remove').addEventListener('click', function() {
+                    state.education.splice(idx, 1);
+                    rerenderForm();
+                    save();
+                });
             });
         }
 
+        // ---------- Other render functions ----------
         function renderSkills() {
             const box = document.getElementById("skillsList");
             box.innerHTML = "";
@@ -1569,8 +1798,9 @@
             if (!has(state.name)) c.push(["Full name is missing", "Add your name in Contact information."]);
             if (!has(state.phone)) c.push(["Phone number is missing", "A recruiter should have a direct way to contact you."]);
             if (!has(state.email)) c.push(["Email address is missing", "Add a professional email address."]);
-            if (!state.education.some(e => has(e.degree) || has(e.school))) c.push(
-                ["No academic qualification added", "Add at least one education entry."]);
+            if (!state.education.some(e => has(e.degree) || has(e.school) || e.leftFields.some(f => has(f.value)) || e
+                    .rightFields.some(f => has(f.value)))) c.push(
+                ["No academic qualification added", "Add at least one education entry with some details."]);
             if (!state.skills.some(has)) c.push(["No skills added yet", "Add skills relevant to the kinds of roles you want."]);
             if (!state.languages.some(l => has(l.name))) c.push(["No language listed", "Add at least one language if applicable."]);
             return c;
@@ -1638,10 +1868,16 @@
         document.getElementById("checkList").onclick = e => { const b = e.target.closest("[data-fix]");
             if (b) show("formScreen") };
 
-        document.getElementById("addEducation").onclick = () => { state.education.push({ degree: "", school: "", left: "",
-                right: "" });
+        document.getElementById("addEducation").onclick = () => {
+            state.education.push({
+                degree: "",
+                school: "",
+                leftFields: [{ label: "Label", value: "" }],
+                rightFields: [{ label: "Label", value: "" }]
+            });
             rerenderForm();
-            save() };
+            save();
+        };
         document.getElementById("addSkill").onclick = () => { state.skills.push("");
             rerenderForm();
             save() };
