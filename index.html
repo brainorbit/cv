@@ -1265,10 +1265,7 @@
                     <div id="languageList"></div><button class="add" id="addLanguage">＋ Add language</button>
                 </div>
 
-                <div class="card" id="referenceCard">
-                    <div class="card-head"><h2>Reference</h2></div>
-                    <textarea id="reference"></textarea>
-                </div>
+                <!-- Reference field removed -->
 
                 <div class="card">
                     <div class="card-head"><h2>Custom Sections</h2><button class="tiny" id="addCustom">＋ Add section</button></div>
@@ -1362,7 +1359,7 @@
                 { name: "Bengali", reading: "Excellent", writing: "Excellent", speaking: "Excellent" },
                 { name: "English", reading: "Good", writing: "Good", speaking: "Good" }
             ],
-            reference: "",
+            // reference field removed
             custom: [],
             declaration: "I hereby declare that the details furnished above are true and correct to the best of my knowledge and belief.",
             photoEnabled: false,
@@ -1469,8 +1466,7 @@
             if (lg.length) h += cvSection("LANGUAGE PROFICIENCY", "language",
                 `<div class="cv-languages">${lg.map(l=>`<p><strong>${esc(l.name)}:</strong> Reading — ${esc(l.reading)} | Writing — ${esc(l.writing)} | Speaking — ${esc(l.speaking)}</p>`).join("")}</div>`
                 );
-            if (has(state.reference)) h += cvSection("REFERENCE", "custom",
-                `<p style="padding-left:34px">${esc(state.reference).replace(/\n/g,"<br>")}</p>`);
+            // Reference section removed
             state.custom.filter(x => has(x.title) && has(x.text)).forEach(x => h += cvSection(x.title, "custom",
                 `<p style="padding-left:34px">${esc(x.text).replace(/\n/g,"<br>")}</p>`));
             h +=
@@ -1578,7 +1574,7 @@
             field("email", "email");
             field("location", "location");
             field("objective", "objective");
-            field("reference", "reference");
+            // reference field removed
             field("declaration", "declaration");
             renderEducation();
             renderSkills();
