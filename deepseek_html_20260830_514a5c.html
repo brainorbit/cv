@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#102f52">
+    <title>CV Builder — General Bangladesh CV</title>
+    <style>
+        :root {
+            --navy: #102f52;
+            --navy2: #123f70;
+            --ink: #17202b;
+            --muted: #687586;
+            --line: #dce2e9;
+            --soft: #f5f7fa;
+            --white: #fff;
+            --danger: #b42318;
+            --shadow: 0 18px 60px rgba(15, 23, 42, .12);
+        }
+        * {
+            box-sizing: border-box
+        }
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Inter, Arial, "Helvetica Neue", sans-serif;
+            color: var(--ink);
+            background: #f3f5f8;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button,
+        input,
+        textarea {
+            font: inherit
+        }
+        button {
+            cursor: pointer
+        }
+        .screen {
+            display: none;
+            min-height: 100vh
+        }
+        .screen.active {
+            display: block
+        }
+        .topbar {
+            height: 68px;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--navy);
+            font-weight: 800
+        }
+        .logo {
+            width: 37px;
+            height: 37px;
+            border-radius: 11px;
+            background: var(--navy);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 11px;
+            letter-spacing: .4px;
+            box-shadow: 0 6px 18px rgba(16, 47, 82, .22)
+        }
+        .btn {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: #273548;
+            border-radius: 11px;
+            padding: 10px 15px;
+            font-weight: 750
+        }
+        .btn.primary {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff
+        }
+        .btn.ghost {
+            background: transparent
+        }
+        .btn.danger {
+            color: var(--danger)
+        }
+        .btn:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid rgba(16, 47, 82, .13);
+            outline-offset: 1px
+        }
+
+        /* Landing */
+        .landing {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 78px 22px 60px;
+            text-align: center
+        }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 999px;
+            padding: 7px 11px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--navy)
+        }
+        .landing h1 {
+            font-size: 42px;
+            line-height: 1.1;
+            margin: 17px 0 10px;
+            letter-spacing: -1px;
+            color: var(--navy)
+        }
+        .landing .lead {
+            max-width: 650px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.65
+        }
+        .create {
+            margin-top: 26px;
+            font-size: 15px;
+            padding: 13px 20px;
+            border-radius: 13px
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 60px;
+            text-align: left
+        }
+        .feature {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 17px
+        }
+        .feature .ico {
+            font-size: 21px
+        }
+        .feature h3 {
+            margin: 10px 0 5px;
+            font-size: 14px;
+            color: var(--navy)
+        }
+        .feature p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11.5px;
+            line-height: 1.5
+        }
+
+        /* Form */
+        .form-topbar {
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            gap: 6px;
+            min-height: 62px;
+        }
+        .form-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .form-topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .back {
+            border: 0;
+            background: transparent;
+            color: var(--navy);
+            font-weight: 750;
+            padding: 8px
+        }
+        .peek {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            color: var(--navy);
+            font-size: 18px;
+            display: grid;
+            place-items: center
+        }
+        .reset-btn {
+            border: 1px solid var(--danger);
+            background: transparent;
+            color: var(--danger);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .reset-btn:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+        .form-layout {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px 16px 100px
+        }
+        .form-scroll {
+            min-width: 0
+        }
+        .form-intro h1 {
+            margin: 0 0 5px;
+            font-size: 25px;
+            color: var(--navy)
+        }
+        .form-intro p {
+            margin: 0 0 19px;
+            color: var(--muted);
+            font-size: 12.5px
+        }
+        .save-status {
+            font-size: 10.5px;
+            color: #687586;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+        .save-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #43a047
+        }
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 11px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, .035)
+        }
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .card h2 {
+            font-size: 14px;
+            color: var(--navy);
+            margin: 0
+        }
+        .card small {
+            font-weight: 500;
+            color: var(--muted)
+        }
+        label {
+            display: block;
+            font-size: 10.5px;
+            color: #657284;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .045em;
+            margin: 0 0 5px
+        }
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid #d5dce5;
+            border-radius: 9px;
+            background: #fff;
+            color: #17202b;
+            padding: 9px 10px;
+            font-size: 12.5px
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5
+        }
+        .field {
+            margin-bottom: 10px
+        }
+        .field:last-child {
+            margin-bottom: 0
+        }
+        .row2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+        .repeat {
+            border: 1px solid #e3e8ee;
+            border-radius: 10px;
+            padding: 11px;
+            margin-top: 9px;
+            background: #fbfcfd
+        }
+        .repeat-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 9px
+        }
+        .repeat-head strong {
+            font-size: 11.5px;
+            color: var(--navy)
+        }
+        .remove {
+            border: 0;
+            background: transparent;
+            color: #7a8795;
+            font-size: 14px
+        }
+        .remove:hover {
+            color: var(--danger)
+        }
+        .add {
+            width: 100%;
+            border: 1px dashed #b8c3cf;
+            background: #fafbfd;
+            color: var(--navy);
+            padding: 9px;
+            border-radius: 9px;
+            font-size: 11.5px;
+            font-weight: 800;
+            margin-top: 8px
+        }
+        .section-tools {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+        .tiny {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--navy);
+            border-radius: 8px;
+            padding: 5px 8px;
+            font-size: 10.5px;
+            font-weight: 750
+        }
+        .custom-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .custom-row input {
+            flex: 1;
+            min-width: 80px;
+        }
+        .helper {
+            font-size: 11px;
+            color: #7b8796;
+            margin-top: 6px;
+            line-height: 1.4
+        }
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px
+        }
+        .toggle-row span {
+            font-size: 12.5px;
+            color: #3a4657;
+            font-weight: 600
+        }
+        .switch {
+            position: relative;
+            width: 40px;
+            height: 23px;
+            background: #d5dce5;
+            border-radius: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background .15s
+        }
+        .switch.on {
+            background: var(--navy)
+        }
+        .switch .knob {
+            position: absolute;
+            top: 2.5px;
+            left: 2.5px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            transition: left .15s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .25)
+        }
+        .switch.on .knob {
+            left: 19.5px
+        }
+        .photo-upload {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .photo-upload.show {
+            display: flex
+        }
+        .photo-preview-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 9px;
+            background: #eef2f6;
+            border: 1px solid var(--line);
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9aa8b8;
+            font-size: 10px
+        }
+        .photo-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none
+        }
+        .photo-preview-box img.set {
+            display: block
+        }
+        .photo-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+        .file-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px dashed #b8c3cf;
+            background: #fafbfd;
+            color: var(--navy);
+            padding: 7px 12px;
+            border-radius: 9px;
+            font-size: 11.5px;
+            font-weight: 750;
+            cursor: pointer;
+            width: fit-content
+        }
+        .file-btn input {
+            display: none
+        }
+        .photo-remove {
+            border: 0;
+            background: transparent;
+            color: var(--danger);
+            font-size: 11px;
+            font-weight: 700;
+            text-align: left;
+            padding: 0
+        }
+
+        /* Preview */
+        .preview-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .preview-head strong {
+            font-size: 14px;
+            color: var(--navy)
+        }
+        .preview-head span {
+            font-size: 10.5px;
+            color: var(--muted)
+        }
+        .review-stage {
+            height: 560px;
+            background: #e5e9ee;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 18px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative
+        }
+        #reviewFrame {
+            flex: 0 0 auto;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center
+        }
+        .cv-page {
+            --s: 1;
+            width: 794px;
+            height: 1123px;
+            background: #fff;
+            padding: 22px 23px 20px;
+            color: #171717;
+            flex: 0 0 auto;
+            box-shadow: 0 8px 28px rgba(15, 23, 42, .16);
+            overflow: hidden;
+            position: relative;
+            transform-origin: top center
+        }
+        .cv-inner {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center
+        }
+        .cv-header {
+            text-align: center;
+            display: grid;
+            grid-template-columns: 104px 1fr 104px;
+            align-items: start;
+            gap: 20px
+        }
+        .cv-header-mid {
+            min-width: 0
+        }
+        .cv-photo-slot {
+            width: 104px;
+            height: 104px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end
+        }
+        .cv-photo-slot:first-child {
+            justify-content: flex-start
+        }
+        .cv-photo {
+            width: calc(100px * var(--s));
+            height: calc(100px * var(--s));
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #c7cfd8
+        }
+        .cv-name {
+            margin: 0;
+            color: #12355b;
+            font-size: calc(42px * var(--s));
+            line-height: 1.03;
+            font-weight: 700;
+            letter-spacing: 1px
+        }
+        .cv-subtitle {
+            margin: calc(4px * var(--s)) 0 calc(14px * var(--s));
+            color: #102f52;
+            font-size: calc(18px * var(--s));
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: .25px
+        }
+        .cv-contact {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 7px calc(13px * var(--s));
+            font-size: calc(10.5px * var(--s));
+            white-space: nowrap;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .cv-divider {
+            height: 0;
+            border: 0;
+            border-top: 1px solid #8d9399;
+            margin: 0 0 calc(2px * var(--s));
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact
+        }
+        .cv-section {
+            padding: calc(14px * var(--s)) 0 calc(13px * var(--s));
+            border-bottom: 1px solid #8d9399
+        }
+        .cv-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 0 calc(7px * var(--s));
+            color: #102f52;
+            font-size: calc(14px * var(--s));
+            line-height: 1.15;
+            font-weight: 700
+        }
+        .cv-title .cv-icon {
+            width: calc(23px * var(--s));
+            height: calc(23px * var(--s));
+            flex: 0 0 auto
+        }
+        .cv-page p {
+            margin: 0;
+            font-size: calc(10.5px * var(--s));
+            line-height: 1.6
+        }
+        .cv-page ul {
+            margin: calc(4px * var(--s)) 0 0 15px;
+            padding: 0
+        }
+        .cv-page li {
+            font-size: calc(10.5px * var(--s));
+            line-height: 1.45;
+            margin-bottom: calc(5px * var(--s))
+        }
+        .cv-edu {
+            margin: 0 0 calc(12px * var(--s));
+            padding-left: 14px
+        }
+        .cv-edu:last-child {
+            margin-bottom: 0
+        }
+        .cv-degree {
+            margin: 0 0 calc(3px * var(--s));
+            font-size: calc(12px * var(--s));
+            line-height: 1.25;
+            font-weight: 700
+        }
+        .cv-school {
+            margin: 0 0 calc(6px * var(--s)) !important;
+            font-size: calc(10.5px * var(--s)) !important
+        }
+        .cv-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: calc(9.5px * var(--s));
+            line-height: 1.3
+        }
+        .cv-skill {
+            padding-left: 14px
+        }
+        .cv-personal {
+            display: grid;
+            grid-template-columns: 145px 1fr;
+            gap: calc(5px * var(--s)) 8px;
+            padding: 0 14px;
+            font-size: calc(10px * var(--s));
+            line-height: 1.4
+        }
+        .cv-languages {
+            padding-left: 14px;
+            font-size: calc(10px * var(--s));
+            line-height: 1.55
+        }
+        .cv-declaration {
+            margin-top: calc(12px * var(--s));
+            padding: calc(9px * var(--s)) 12px;
+            border: 1px solid #9aa9ba;
+            background: #f8fafc;
+            text-align: center
+        }
+        .cv-declaration-title {
+            margin-bottom: calc(4px * var(--s));
+            color: #102f52;
+            font-size: calc(10.5px * var(--s));
+            font-weight: 700
+        }
+        .cv-declaration-text {
+            font-size: calc(9px * var(--s));
+            line-height: 1.4
+        }
+        .cv-signature {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            margin-top: calc(20px * var(--s));
+            padding: 0 30px
+        }
+        .cv-sign-item {
+            display: flex;
+            align-items: baseline;
+            gap: 7px;
+            font-size: calc(10px * var(--s));
+            color: #2c3846;
+            font-weight: 700
+        }
+        .cv-dots {
+            width: 100px;
+            border-bottom: 1px dotted #556170;
+            height: 1px;
+            transform: translateY(-3px)
+        }
+
+        /* Fullscreen live-preview modal */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #1a2634;
+            z-index: 200;
+            flex-direction: column
+        }
+        .overlay.active {
+            display: flex
+        }
+        .peek-topbar {
+            height: 60px;
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: rgba(255, 255, 255, .06);
+            border-bottom: 1px solid rgba(255, 255, 255, .1)
+        }
+        .peek-topbar strong {
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 750
+        }
+        .peek-topbar span {
+            color: rgba(255, 255, 255, .55);
+            font-size: 11px
+        }
+        .peek-close {
+            border: 1px solid rgba(255, 255, 255, .25);
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            line-height: 1;
+            display: grid;
+            place-items: center
+        }
+        .peek-close:hover {
+            background: rgba(255, 255, 255, .18)
+        }
+        .peek-stage {
+            flex: 1 1 auto;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px
+        }
+        #peekFrame {
+            flex: 0 0 auto;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center
+        }
+        .peek-stage .cv-page {
+            box-shadow: 0 20px 70px rgba(0, 0, 0, .45)
+        }
+
+        /* Confirm */
+        .center {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 65px 22px
+        }
+        .center h1 {
+            font-size: 27px;
+            color: var(--navy);
+            margin: 0 0 7px
+        }
+        .center .sub {
+            color: var(--muted);
+            font-size: 13px;
+            margin: 0 0 25px
+        }
+        .checks {
+            list-style: none;
+            padding: 0;
+            margin: 0
+        }
+        .check {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 13px 14px;
+            margin-bottom: 8px
+        }
+        .check .warn {
+            font-size: 18px
+        }
+        .check .txt {
+            flex: 1
+        }
+        .check strong {
+            display: block;
+            font-size: 12.5px
+        }
+        .check span {
+            font-size: 10.5px;
+            color: var(--muted)
+        }
+        .fix {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--navy);
+            border-radius: 8px;
+            padding: 6px 9px;
+            font-size: 10.5px;
+            font-weight: 800
+        }
+        .good {
+            text-align: center;
+            background: #f5faf7;
+            border: 1px solid #cfe5d8;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px
+        }
+        .good strong {
+            display: block;
+            color: #1c633c;
+            font-size: 14px
+        }
+        .confirm-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        /* Final */
+        #finalScreen.active {
+            display: flex;
+            flex-direction: column;
+            height: 100vh
+        }
+        .final-top {
+            flex: 0 0 auto;
+            text-align: center;
+            padding: 26px 20px 14px
+        }
+        .final-top h1 {
+            margin: 0 0 6px;
+            color: var(--navy);
+            font-size: 26px
+        }
+        .final-top p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12.5px
+        }
+        .final-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px 14px;
+            overflow: hidden
+        }
+        .final-stage {
+            width: 100%;
+            height: 100%;
+            background: #e5e9ee;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative
+        }
+        #finalFrame {
+            flex: 0 0 auto;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center
+        }
+        .final-stage .cv-page {
+            box-shadow: 0 8px 28px rgba(15, 23, 42, .16)
+        }
+        .final-actions {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 0 22px;
+            flex-wrap: wrap;
+        }
+
+        /* Print: exact one A4 page, no wrapper-induced blank page */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0
+            }
+            html,
+            body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+                overflow: hidden !important
+            }
+            body * {
+                visibility: hidden !important
+            }
+            #finalScreen,
+            #finalScreen * {
+                visibility: visible !important
+            }
+            #finalScreen {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                min-height: 0 !important
+            }
+            #finalScreen .final-top,
+            #finalScreen .final-actions {
+                display: none !important
+            }
+            #finalScreen .final-wrap {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important
+            }
+            #finalScreen .final-stage {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: 0 !important;
+                border-radius: 0 !important;
+                background: #fff !important;
+                overflow: hidden !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-width: none !important
+            }
+            #finalFrame {
+                display: block !important;
+                width: 210mm !important;
+                height: 297mm !important
+            }
+            #cvFinal {
+                display: block !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                min-height: 297mm !important;
+                max-height: 297mm !important;
+                margin: 0 !important;
+                padding: 22px 23px 20px !important;
+                box-shadow: none !important;
+                overflow: hidden !important;
+                transform: none !important
+            }
+            #cvFinal .cv-divider {
+                border-top: 1px solid #8d9399 !important;
+                print-color-adjust: exact !important;
+                -webkit-print-color-adjust: exact !important
+            }
+        }
+
+        /* Responsive – Mobile First improvements */
+        @media(max-width:980px) {
+            .feature-grid {
+                grid-template-columns: 1fr
+            }
+            .topbar {
+                padding: 0 12px;
+                height: auto;
+                min-height: 60px;
+                gap: 4px;
+            }
+            .form-topbar {
+                padding: 6px 10px;
+                gap: 6px;
+                min-height: 54px;
+            }
+            .form-layout {
+                padding: 16px 10px 80px;
+            }
+            .review-stage {
+                padding: 10px;
+                height: 460px;
+            }
+        }
+        @media(max-width:600px) {
+            .landing {
+                padding-top: 45px;
+            }
+            .landing h1 {
+                font-size: 28px;
+            }
+            .row2 {
+                grid-template-columns: 1fr;
+            }
+            .review-stage {
+                height: 380px;
+                padding: 6px;
+            }
+            .peek-stage {
+                padding: 12px;
+            }
+            .final-wrap {
+                padding: 0 8px 8px;
+            }
+            .final-stage {
+                border-radius: 10px;
+            }
+            .center {
+                padding: 30px 12px;
+            }
+            .cv-contact {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px 12px;
+            }
+            .form-topbar .back {
+                padding: 4px 6px;
+                font-size: 13px;
+            }
+            .peek {
+                width: 34px;
+                height: 34px;
+                font-size: 16px;
+            }
+            .reset-btn {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+            .form-topbar .left,
+            .form-topbar .right {
+                gap: 6px;
+            }
+        }
+        @media(max-width:420px) {
+            .review-stage {
+                height: 300px;
+                padding: 4px;
+            }
+            .cv-header {
+                grid-template-columns: 60px 1fr 60px !important;
+                gap: 10px;
+            }
+            .cv-photo-slot {
+                width: 60px;
+                height: 60px;
+            }
+            .cv-photo {
+                width: calc(56px * var(--s));
+                height: calc(56px * var(--s));
+            }
+            .cv-name {
+                font-size: calc(24px * var(--s)) !important;
+            }
+            .cv-subtitle {
+                font-size: calc(12px * var(--s)) !important;
+            }
+            .peek-stage {
+                padding: 6px;
+            }
+            .final-wrap {
+                padding: 0 4px 4px;
+            }
+            .final-stage {
+                border-radius: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1 -->
+    <section id="landing" class="screen active">
+        <header class="topbar">
+            <div class="brand"><div class="logo">CV</div><span>CV Builder</span></div>
+        </header>
+        <div class="landing">
+            <div class="eyebrow">🇧🇩 General Bangladesh CV</div>
+            <h1>Create a professional CV,<br>without the formatting work.</h1>
+            <p class="lead">Fill in your information, see the final A4 CV as you build it, review it once, and download a print-ready PDF.</p>
+            <button class="btn primary create" id="createBtn">Create my CV&nbsp; →</button>
+            <div class="feature-grid">
+                <div class="feature"><div class="ico">📄</div><h3>ATS-friendly format</h3><p>Clean single-column structure with real text, designed to remain easy for recruitment software to read.</p></div>
+                <div class="feature"><div class="ico">✦</div><h3>Made for Bangladesh</h3><p>Includes the personal-information and declaration fields commonly used in local job applications.</p></div>
+                <div class="feature"><div class="ico">💾</div><h3>Auto-saved</h3><p>Your draft stays on this device, so a refresh or accidental close won't erase your work.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 2 -->
+    <section id="formScreen" class="screen">
+        <div class="form-topbar">
+            <div class="left">
+                <button class="back" id="backHome">← Back</button>
+                <div class="save-status"><i class="save-dot"></i><span id="saveText">Saved on this device</span></div>
+            </div>
+            <div class="right">
+                <button class="reset-btn" id="resetBtn">↺ Reset</button>
+                <button class="peek" id="peekBtn" title="Preview">⌁</button>
+            </div>
+        </div>
+        <div class="form-layout">
+            <div class="form-scroll">
+                <div class="form-intro"><h1>Your details</h1><p>Everything is editable. Remove anything you don't need or add your own sections.</p></div>
+                <div class="card">
+                    <div class="card-head"><h2>Photo</h2></div>
+                    <div class="toggle-row">
+                        <span>Include a photo on the CV?</span>
+                        <div class="switch" id="photoSwitch"><div class="knob"></div></div>
+                    </div>
+                    <div class="photo-upload" id="photoUploadRow">
+                        <div class="photo-preview-box"><img id="photoPreviewImg" alt=""></div>
+                        <div class="photo-actions">
+                            <label class="file-btn">📷 Choose photo<input type="file" accept="image/*" id="photoInput"></label>
+                            <button class="photo-remove" id="photoRemoveBtn" style="display:none">Remove photo</button>
+                        </div>
+                    </div>
+                    <div class="helper">A recent passport-style photo works best. It stays saved only on this device.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><h2>Contact information</h2></div>
+                    <div class="field"><label>Full name</label><input id="name"></div>
+                    <div class="row2">
+                        <div class="field"><label>Phone</label><input id="phone"></div>
+                        <div class="field"><label>Email</label><input id="email"></div>
+                    </div>
+                    <div class="field"><label>Location</label><input id="location"></div>
+                </div>
+
+                <div class="card" id="objectiveCard">
+                    <div class="card-head"><h2>Career Objective</h2><div class="section-tools"><button class="tiny" data-clear="objective">Clear</button></div></div>
+                    <div class="field"><textarea id="objective"></textarea></div>
+                </div>
+
+                <div class="card" id="educationCard">
+                    <div class="card-head"><h2>Academic Qualifications</h2></div>
+                    <div id="educationList"></div><button class="add" id="addEducation">＋ Add education</button>
+                </div>
+
+                <div class="card" id="skillsCard">
+                    <div class="card-head"><h2>Key Skills &amp; Strengths</h2></div>
+                    <div id="skillsList"></div><button class="add" id="addSkill">＋ Add skill</button>
+                </div>
+
+                <div class="card" id="personalCard">
+                    <div class="card-head"><h2>Personal Information</h2><button class="tiny" id="addPersonal">＋ Add field</button></div>
+                    <div id="personalList"></div>
+                </div>
+
+                <div class="card" id="languageCard">
+                    <div class="card-head"><h2>Language Proficiency</h2></div>
+                    <div id="languageList"></div><button class="add" id="addLanguage">＋ Add language</button>
+                </div>
+
+                <div class="card" id="referenceCard">
+                    <div class="card-head"><h2>Reference</h2></div>
+                    <textarea id="reference"></textarea>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><h2>Custom Sections</h2><button class="tiny" id="addCustom">＋ Add section</button></div>
+                    <div id="customList"></div>
+                    <div class="helper">Examples: Training &amp; Certifications, Projects, Volunteer Experience, Achievements.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><h2>Declaration</h2></div>
+                    <textarea id="declaration"></textarea>
+                </div>
+
+                <button class="btn primary" id="reviewBtn" style="width:100%;padding:12px">Review CV&nbsp; →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 3 -->
+    <section id="confirmScreen" class="screen">
+        <div class="center">
+            <h1>Quick check before you finish</h1>
+            <p class="sub">These are useful checks, not hard requirements. You can fix anything or continue anyway.</p>
+            <div id="goodBox" class="good" style="display:none"><strong>✓ Nothing important looks missing</strong><span style="font-size:11px;color:#597063">Your CV is ready for a final review.</span></div>
+            <ul class="checks" id="checkList"></ul>
+            <div class="preview-head" style="margin-top:22px"><strong>Live preview</strong><span>A4 • updates automatically</span></div>
+            <div class="review-stage"><div id="reviewFrame"><div id="cvReview" class="cv-page"></div></div></div>
+            <div class="confirm-actions"><button class="btn" id="editBtn">← Back to editing</button><button class="btn primary" id="finishBtn">Continue →</button></div>
+        </div>
+    </section>
+
+    <!-- SCREEN 4 -->
+    <section id="finalScreen" class="screen">
+        <div class="final-top"><h1>Your CV is ready</h1><p>Review the A4 page below, then edit or download it as PDF.</p></div>
+        <div class="final-wrap"><div class="final-stage"><div id="finalFrame"><div id="cvFinal" class="cv-page"></div></div></div></div>
+        <div class="final-actions"><button class="btn" id="finalEdit">✎ Edit CV</button><button class="btn primary" id="downloadBtn">↓ Download PDF</button></div>
+    </section>
+
+    <!-- Fullscreen live preview -->
+    <div class="overlay" id="peekOverlay">
+        <div class="peek-topbar">
+            <div><strong>Live preview</strong> <span style="margin-left:8px">A4 • updates automatically</span></div>
+            <button class="peek-close" id="peekClose" aria-label="Close preview">×</button>
+        </div>
+        <div class="peek-stage">
+            <div id="peekFrame"><div id="cvPeek" class="cv-page"></div></div>
+        </div>
+    </div>
+
+    <script>
+        const KEY = "generalBangladeshCvBuilderFinalV2";
+        const DEFAULT = {
+            name: "Zinuk Akter",
+            phone: "01327 9XXXXXX",
+            email: "zinuk.akter383@gmail.com",
+            location: "Tangail, Bangladesh",
+            objective: "Motivated and responsible Honours student seeking an opportunity in a reputable organization where I can apply my analytical, communication, organizational, and problem-solving skills, contribute effectively to the organization, and develop my professional career.",
+            education: [
+                { degree: "B.Sc. (Honours) in Mathematics — 2nd Year", school: "Govt. Saadat College, Tangail | National University",
+                    left: "Group/Subject: Mathematics", right: "Status: Running" },
+                { degree: "Higher Secondary Certificate (HSC)", school: "Major General Mahmudul Hasan Adarsha College | Dhaka Board",
+                    left: "Group: Science", right: "Passing Year: 2023 | GPA: 4.67" },
+                { degree: "Secondary School Certificate (SSC)", school: "Tangail Girls' High School | Dhaka Board",
+                    left: "Group: Science", right: "Passing Year: 2021 | GPA: 5.00" }
+            ],
+            skills: [
+                "Microsoft Office: Proficient in MS Word (report writing) and MS Excel (data entry and tables).",
+                "Computer Skills: MS Word, MS Excel, email communication, internet research, and online documentation.",
+                "Management: Ability to organize team activities and manage schedules.",
+                "Communication: Excellent verbal and written communication skills in Bengali and English.",
+                "Adaptability: Quick to learn new tasks, tools, and working procedures."
+            ],
+            personal: [
+                ["Father's Name", "Masud Rana"],
+                ["Mother's Name", "Anjuman Ara Begum"],
+                ["Date of Birth", "28 October 2005"],
+                ["Religion", "Islam"],
+                ["Marital Status", "Unmarried"],
+                ["Nationality", "Bangladeshi"],
+                ["Present Address", "Alowa Tarini, Berabusna, Tangail Sadar, Tangail Paurashava"],
+                ["Permanent Address", "Alowa Tarini, Berabusna, Tangail Sadar, Tangail Paurashava"]
+            ],
+            languages: [
+                { name: "Bengali", reading: "Excellent", writing: "Excellent", speaking: "Excellent" },
+                { name: "English", reading: "Good", writing: "Good", speaking: "Good" }
+            ],
+            reference: "",
+            custom: [],
+            declaration: "I hereby declare that the details furnished above are true and correct to the best of my knowledge and belief.",
+            photoEnabled: false,
+            photoData: null
+        };
+        let state = load();
+
+        function clone(x) { return JSON.parse(JSON.stringify(x)) }
+
+        function load() {
+            try {
+                const x = JSON.parse(localStorage.getItem(KEY));
+                return x ? x : clone(DEFAULT)
+            } catch (e) { return clone(DEFAULT) }
+        }
+
+        function esc(s = "") { return String(s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;",
+                '"': "&quot;", "'": "&#039;" } [m])) }
+
+        function has(s) { return s != null && String(s).trim() !== "" }
+
+        function show(id) {
+            document.querySelectorAll(".screen").forEach(x => x.classList.remove("active"));
+            document.getElementById(id).classList.add("active");
+            window.scrollTo(0, 0);
+            if (id === "confirmScreen") {
+                setTimeout(() => { fitPageToFrame("reviewFrame", "cvReview", getContainerSize("review-stage", 28)); }, 80);
+            }
+            if (id === "finalScreen") {
+                setTimeout(() => { fitPageToFrame("finalFrame", "cvFinal", getContainerSize("final-stage", 32)); }, 80);
+            }
+        }
+
+        function save() {
+            localStorage.setItem(KEY, JSON.stringify(state));
+            document.getElementById("saveText").textContent = "Saved just now";
+            clearTimeout(window.saveTimer);
+            window.saveTimer = setTimeout(() => document.getElementById("saveText").textContent = "Saved on this device", 900)
+        }
+
+        function field(id, key) {
+            const e = document.getElementById(id);
+            e.value = state[key] || "";
+            e.oninput = () => { state[key] = e.value;
+                renderPreview();
+                save() }
+        }
+
+        function icon(type) {
+            const c = "#102f52";
+            if (type === "objective") return `<svg class="cv-icon" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="${c}"/><circle cx="16" cy="12" r="4" fill="#fff"/><path fill="#fff" d="M8.5 24c1.2-4 3.6-6 7.5-6s6.3 2 7.5 6z"/></svg>`;
+            if (type === "education") return `<svg class="cv-icon" viewBox="0 0 32 32"><path fill="${c}" d="m2 11 14-7 14 7-14 7z"/><path fill="${c}" d="M7 14v7c4 3 14 3 18 0v-7l-9 4z"/><path fill="${c}" d="M28 11h2v10h-2z"/></svg>`;
+            if (type === "skills") return `<svg class="cv-icon" viewBox="0 0 32 32"><path fill="${c}" d="M11 8V6.5A2.5 2.5 0 0 1 13.5 4h5A2.5 2.5 0 0 1 21 6.5V8h5a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zm2 0h6V6h-6z"/><path fill="#fff" d="M4 14h24v3H4z"/></svg>`;
+            if (type === "personal") return `<svg class="cv-icon" viewBox="0 0 32 32"><circle cx="16" cy="10.5" r="5.2" fill="${c}"/><path fill="${c}" d="M6 27c.7-6 4-9 10-9s9.3 3 10 9z"/></svg>`;
+            if (type === "language") return `<svg class="cv-icon" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="${c}" stroke-width="2.5"/><path fill="none" stroke="${c}" stroke-width="1.8" d="M3.5 16h25M16 3c4 3.4 6 7.7 6 13s-2 9.6-6 13c-4-3.4-6-7.7-6-13s2-9.6 6-13z"/></svg>`;
+            return `<svg class="cv-icon" viewBox="0 0 32 32"><rect x="4" y="5" width="24" height="22" rx="3" fill="none" stroke="${c}" stroke-width="2"/><path fill="none" stroke="${c}" stroke-width="2" d="M9 11h14M9 16h14M9 21h9"/></svg>`;
+        }
+
+        function cvSection(title, type, content) {
+            return `<section class="cv-section"><h2 class="cv-title">${icon(type)}<span>${esc(title)}</span></h2>${content}</section>`;
+        }
+
+        function buildCv() {
+            const photoHtml = (state.photoEnabled && state.photoData) ? `<img class="cv-photo" src="${state.photoData}" alt="Photo">` :
+                "";
+            let h = `<header class="cv-header"><div class="cv-photo-slot"></div><div class="cv-header-mid"><h1 class="cv-name">${esc(state.name)}</h1><div class="cv-subtitle">CURRICULUM VITAE</div><div class="cv-contact">
+ ${has(state.phone)?`<span>☎ ${esc(state.phone)}</span>`:""}${has(state.email)?`<span>✉ ${esc(state.email)}</span>`:""}${has(state.location)?`<span>⌖ ${esc(state.location)}</span>`:""}
+ </div></div><div class="cv-photo-slot">${photoHtml}</div></header><div class="cv-divider"></div>`;
+            if (has(state.objective)) h += cvSection("CAREER OBJECTIVE", "objective", `<p>${esc(state.objective)}</p>`);
+            const ed = state.education.filter(e => has(e.degree) || has(e.school) || has(e.left) || has(e.right));
+            if (ed.length) h += cvSection("ACADEMIC QUALIFICATIONS", "education", ed.map(e =>
+                `<article class="cv-edu">${has(e.degree)?`<h3 class="cv-degree">${esc(e.degree)}</h3>`:""}${has(e.school)?`<p class="cv-school">${esc(e.school)}</p>`:""}${has(e.left)||has(e.right)?`<div class="cv-meta"><span>${esc(e.left)}</span><span>${esc(e.right)}</span></div>`:""}</article>`
+                ).join(""));
+            const sk = state.skills.filter(has);
+            if (sk.length) h += cvSection("KEY SKILLS & STRENGTHS", "skills",
+                `<div class="cv-skill"><ul>${sk.map(x=>{const i=x.indexOf(":");return i>-1?`<li><strong>${esc(x.slice(0,i+1))}</strong>${esc(x.slice(i+1))}</li>`:`<li>${esc(x)}</li>`}).join("")}</ul></div>`
+                );
+            const pi = state.personal.filter(p => has(p[0]) || has(p[1]));
+            if (pi.length) h += cvSection("PERSONAL INFORMATION", "personal",
+                `<div class="cv-personal">${pi.map(p=>`<b>${esc(p[0])}</b><span>${esc(p[1])}</span>`).join("")}</div>`);
+            const lg = state.languages.filter(l => has(l.name) || has(l.reading) || has(l.writing) || has(l.speaking));
+            if (lg.length) h += cvSection("LANGUAGE PROFICIENCY", "language",
+                `<div class="cv-languages">${lg.map(l=>`<p><strong>${esc(l.name)}:</strong> Reading — ${esc(l.reading)} | Writing — ${esc(l.writing)} | Speaking — ${esc(l.speaking)}</p>`).join("")}</div>`
+                );
+            if (has(state.reference)) h += cvSection("REFERENCE", "custom",
+                `<p style="padding-left:34px">${esc(state.reference).replace(/\n/g,"<br>")}</p>`);
+            state.custom.filter(x => has(x.title) && has(x.text)).forEach(x => h += cvSection(x.title, "custom",
+                `<p style="padding-left:34px">${esc(x.text).replace(/\n/g,"<br>")}</p>`));
+            h +=
+            `<div class="cv-declaration"><div class="cv-declaration-title">DECLARATION</div><div class="cv-declaration-text">${esc(state.declaration)}</div><div class="cv-signature"><div class="cv-sign-item">Date<span class="cv-dots"></span></div><div class="cv-sign-item">Signature<span class="cv-dots"></span></div></div></div>`;
+            return h;
+        }
+
+        function renderPreview() {
+            const h = buildCv();
+            ["cvReview", "cvPeek", "cvFinal"].forEach(id => {
+                document.getElementById(id).innerHTML = `<div class="cv-inner">${h}</div>`;
+                fitCvContent(id);
+            });
+            requestAnimationFrame(() => {
+                fitPageToFrame("reviewFrame", "cvReview", getContainerSize("review-stage", 28));
+                fitPageToFrame("peekFrame", "cvPeek", getContainerSize("peek-stage", 40));
+                fitPageToFrame("finalFrame", "cvFinal", getContainerSize("final-stage", 32));
+            });
+        }
+
+        function getContainerSize(stageSel, pad) {
+            const stage = document.querySelector(stageSel);
+            if (!stage) return { w: 794, h: 1123 };
+            const rect = stage.getBoundingClientRect();
+            const w = Math.max(100, rect.width - pad * 2);
+            const h = Math.max(100, rect.height - pad * 2);
+            return { w, h };
+        }
+
+        const CV_AVAIL_H = 1081;
+
+        function fitCvContent(id) {
+            const page = document.getElementById(id);
+            if (!page) return;
+            const inner = page.querySelector(".cv-inner");
+            if (!inner) return;
+            page.style.setProperty("--s", "1");
+            inner.style.justifyContent = "flex-start";
+            requestAnimationFrame(() => {
+                const natural = inner.scrollHeight;
+                if (!natural) return;
+                let scale = 1;
+                if (natural < CV_AVAIL_H) scale = Math.min(1.06, CV_AVAIL_H / natural);
+                else if (natural > CV_AVAIL_H) scale = Math.max(0.7, CV_AVAIL_H / natural);
+                page.style.setProperty("--s", String(scale));
+                requestAnimationFrame(() => {
+                    const after = inner.scrollHeight;
+                    if (after > CV_AVAIL_H) {
+                        scale = Math.max(0.6, scale * (CV_AVAIL_H / after));
+                        page.style.setProperty("--s", String(scale));
+                    }
+                    inner.style.justifyContent = inner.scrollHeight <= CV_AVAIL_H ? "center" : "flex-start";
+                });
+            });
+        }
+
+        function fitPageToFrame(frameId, pageId, dims) {
+            const frame = document.getElementById(frameId);
+            const page = document.getElementById(pageId);
+            if (!frame || !page) return;
+            const { w, h } = dims || getContainerSize(
+                frameId === "reviewFrame" ? "review-stage" :
+                frameId === "peekFrame" ? "peek-stage" : "final-stage",
+                frameId === "reviewFrame" ? 28 : frameId === "peekFrame" ? 40 : 32
+            );
+            const scale = Math.min(1, w / 794, h / 1123);
+            const fw = Math.round(794 * scale);
+            const fh = Math.round(1123 * scale);
+            frame.style.width = fw + "px";
+            frame.style.height = fh + "px";
+            page.style.transform = `scale(${scale})`;
+            page.style.transformOrigin = "top center";
+        }
+
+        function watchFit(stageSel, frameId, pageId, pad) {
+            const stage = document.querySelector(stageSel);
+            if (!stage) return;
+            const apply = () => {
+                const dims = getContainerSize(stageSel, pad);
+                fitPageToFrame(frameId, pageId, dims);
+            };
+            apply();
+            if ("ResizeObserver" in window) {
+                const ro = new ResizeObserver(apply);
+                ro.observe(stage);
+            }
+            window.addEventListener("resize", apply);
+            const mo = new MutationObserver(apply);
+            mo.observe(stage, { attributes: true, childList: true, subtree: true, attributeFilter: ["style", "class"] });
+        }
+
+        function syncPhotoUI() {
+            document.getElementById("photoSwitch").classList.toggle("on", state.photoEnabled);
+            document.getElementById("photoUploadRow").classList.toggle("show", state.photoEnabled);
+            const img = document.getElementById("photoPreviewImg");
+            if (state.photoData) { img.src = state.photoData;
+                img.classList.add("set");
+                document.getElementById("photoRemoveBtn").style.display = "block" } else { img.classList.remove("set");
+                document.getElementById("photoRemoveBtn").style.display = "none" }
+        }
+
+        function rerenderForm() {
+            field("name", "name");
+            field("phone", "phone");
+            field("email", "email");
+            field("location", "location");
+            field("objective", "objective");
+            field("reference", "reference");
+            field("declaration", "declaration");
+            renderEducation();
+            renderSkills();
+            renderPersonal();
+            renderLanguages();
+            renderCustom();
+            syncPhotoUI();
+            renderPreview();
+        }
+
+        function renderEducation() {
+            const box = document.getElementById("educationList");
+            box.innerHTML = "";
+            state.education.forEach((e, i) => {
+                const d = document.createElement("div");
+                d.className = "repeat";
+                d.innerHTML = `<div class="repeat-head"><strong>Education ${i+1}</strong><button class="remove">✕</button></div>
+   <div class="field"><label>Qualification</label><input data-k="degree" value="${esc(e.degree)}"></div>
+   <div class="field"><label>Institution / Board</label><input data-k="school" value="${esc(e.school)}"></div>
+   <div class="row2"><div class="field"><label>Left detail</label><input data-k="left" value="${esc(e.left)}"></div><div class="field"><label>Right detail</label><input data-k="right" value="${esc(e.right)}"></div></div>`;
+                d.querySelectorAll("input").forEach(x => x.oninput = () => { e[x.dataset.k] = x.value;
+                    renderPreview();
+                    save() });
+                d.querySelector(".remove").onclick = () => { state.education.splice(i, 1);
+                    rerenderForm();
+                    save() };
+                box.appendChild(d);
+            });
+        }
+
+        function renderSkills() {
+            const box = document.getElementById("skillsList");
+            box.innerHTML = "";
+            state.skills.forEach((s, i) => {
+                const d = document.createElement("div");
+                d.className = "repeat";
+                d.innerHTML =
+                    `<div class="repeat-head"><strong>Skill ${i+1}</strong><button class="remove">✕</button></div><textarea>${esc(s)}</textarea>`;
+                d.querySelector("textarea").oninput = e => { state.skills[i] = e.target.value;
+                    renderPreview();
+                    save() };
+                d.querySelector(".remove").onclick = () => { state.skills.splice(i, 1);
+                    rerenderForm();
+                    save() };
+                box.appendChild(d);
+            });
+        }
+
+        function renderPersonal() {
+            const box = document.getElementById("personalList");
+            box.innerHTML = "";
+            state.personal.forEach((p, i) => {
+                const d = document.createElement("div");
+                d.className = "custom-row";
+                d.style.marginBottom = "8px";
+                d.innerHTML =
+                    `<input placeholder="Label" value="${esc(p[0])}"><input placeholder="Information" value="${esc(p[1])}"><button class="remove">✕</button>`;
+                const ins = d.querySelectorAll("input");
+                ins[0].oninput = e => { p[0] = e.target.value;
+                    renderPreview();
+                    save() };
+                ins[1].oninput = e => { p[1] = e.target.value;
+                    renderPreview();
+                    save() };
+                d.querySelector(".remove").onclick = () => { state.personal.splice(i, 1);
+                    rerenderForm();
+                    save() };
+                box.appendChild(d);
+            });
+        }
+
+        function renderLanguages() {
+            const box = document.getElementById("languageList");
+            box.innerHTML = "";
+            state.languages.forEach((l, i) => {
+                const d = document.createElement("div");
+                d.className = "repeat";
+                d.innerHTML = `<div class="repeat-head"><strong>Language ${i+1}</strong><button class="remove">✕</button></div><div class="row2">
+   <div class="field"><label>Language</label><input data-k="name" value="${esc(l.name)}"></div><div class="field"><label>Reading</label><input data-k="reading" value="${esc(l.reading)}"></div>
+   <div class="field"><label>Writing</label><input data-k="writing" value="${esc(l.writing)}"></div><div class="field"><label>Speaking</label><input data-k="speaking" value="${esc(l.speaking)}"></div></div>`;
+                d.querySelectorAll("input").forEach(x => x.oninput = () => { l[x.dataset.k] = x.value;
+                    renderPreview();
+                    save() });
+                d.querySelector(".remove").onclick = () => { state.languages.splice(i, 1);
+                    rerenderForm();
+                    save() };
+                box.appendChild(d);
+            });
+        }
+
+        function renderCustom() {
+            const box = document.getElementById("customList");
+            box.innerHTML = "";
+            state.custom.forEach((x, i) => {
+                const d = document.createElement("div");
+                d.className = "repeat";
+                d.innerHTML = `<div class="repeat-head"><strong>Custom section ${i+1}</strong><button class="remove">✕</button></div>
+   <div class="field"><label>Section title</label><input value="${esc(x.title)}"></div><div class="field"><label>Information</label><textarea>${esc(x.text)}</textarea></div>`;
+                const inputs = d.querySelectorAll("input,textarea");
+                inputs[0].oninput = e => { x.title = e.target.value;
+                    renderPreview();
+                    save() };
+                inputs[1].oninput = e => { x.text = e.target.value;
+                    renderPreview();
+                    save() };
+                d.querySelector(".remove").onclick = () => { state.custom.splice(i, 1);
+                    rerenderForm();
+                    save() };
+                box.appendChild(d);
+            });
+        }
+
+        function checks() {
+            const c = [];
+            if (!has(state.name)) c.push(["Full name is missing", "Add your name in Contact information."]);
+            if (!has(state.phone)) c.push(["Phone number is missing", "A recruiter should have a direct way to contact you."]);
+            if (!has(state.email)) c.push(["Email address is missing", "Add a professional email address."]);
+            if (!state.education.some(e => has(e.degree) || has(e.school))) c.push(
+                ["No academic qualification added", "Add at least one education entry."]);
+            if (!state.skills.some(has)) c.push(["No skills added yet", "Add skills relevant to the kinds of roles you want."]);
+            if (!state.languages.some(l => has(l.name))) c.push(["No language listed", "Add at least one language if applicable."]);
+            return c;
+        }
+
+        function renderChecks() {
+            const list = document.getElementById("checkList"),
+                c = checks();
+            document.getElementById("goodBox").style.display = c.length ? "none" : "block";
+            list.innerHTML = c.map((x, i) =>
+                `<li class="check"><div class="warn">⚠️</div><div class="txt"><strong>${esc(x[0])}</strong><span>${esc(x[1])}</span></div><button class="fix" data-fix="${i}">Fix</button></li>`
+                ).join("");
+        }
+
+        // ---- Init watchers ----
+        watchFit(".review-stage", "reviewFrame", "cvReview", 28);
+        watchFit(".peek-stage", "peekFrame", "cvPeek", 40);
+        watchFit(".final-stage", "finalFrame", "cvFinal", 32);
+
+        // ---- Event listeners ----
+        document.getElementById("createBtn").onclick = () => { show("formScreen");
+            rerenderForm() };
+        document.getElementById("backHome").onclick = () => show("landing");
+        document.getElementById("peekBtn").onclick = openPeek;
+        document.getElementById("peekClose").onclick = closePeek;
+        document.getElementById("peekOverlay").addEventListener("click", e => { if (e.target.id === "peekOverlay") closePeek() });
+        window.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("peekOverlay").classList
+                .contains("active")) closePeek() });
+
+        document.getElementById("reviewBtn").onclick = () => {
+            renderChecks();
+            renderPreview();
+            show("confirmScreen");
+            setTimeout(() => fitPageToFrame("reviewFrame", "cvReview", getContainerSize("review-stage", 28)), 80);
+        };
+        document.getElementById("editBtn").onclick = () => show("formScreen");
+        document.getElementById("finishBtn").onclick = () => {
+            show("finalScreen");
+            renderPreview();
+            setTimeout(() => fitPageToFrame("finalFrame", "cvFinal", getContainerSize("final-stage", 32)), 80);
+        };
+        document.getElementById("finalEdit").onclick = () => show("formScreen");
+        document.getElementById("downloadBtn").onclick = () => window.print();
+
+        document.getElementById("photoSwitch").onclick = () => { state.photoEnabled = !state.photoEnabled;
+            syncPhotoUI();
+            renderPreview();
+            save() };
+        document.getElementById("photoInput").onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => { state.photoData = ev.target.result;
+                state.photoEnabled = true;
+                syncPhotoUI();
+                renderPreview();
+                save() };
+            reader.readAsDataURL(file);
+        };
+        document.getElementById("photoRemoveBtn").onclick = () => { state.photoData = null;
+            syncPhotoUI();
+            renderPreview();
+            save() };
+
+        document.getElementById("checkList").onclick = e => { const b = e.target.closest("[data-fix]");
+            if (b) show("formScreen") };
+
+        document.getElementById("addEducation").onclick = () => { state.education.push({ degree: "", school: "", left: "",
+                right: "" });
+            rerenderForm();
+            save() };
+        document.getElementById("addSkill").onclick = () => { state.skills.push("");
+            rerenderForm();
+            save() };
+        document.getElementById("addPersonal").onclick = () => { state.personal.push(["", ""]);
+            rerenderForm();
+            save() };
+        document.getElementById("addLanguage").onclick = () => { state.languages.push({ name: "", reading: "", writing: "",
+                speaking: "" });
+            rerenderForm();
+            save() };
+        document.getElementById("addCustom").onclick = () => { state.custom.push({ title: "", text: "" });
+            rerenderForm();
+            save() };
+        document.querySelectorAll("[data-clear]").forEach(b => b.onclick = () => { state[b.dataset.clear] = "";
+            rerenderForm();
+            save() });
+
+        // ---- Reset button ----
+        document.getElementById("resetBtn").onclick = function() {
+            if (confirm("Reset all fields to default? This will erase current changes.")) {
+                state = clone(DEFAULT);
+                save();
+                rerenderForm();
+                alert("CV reset to default.");
+            }
+        };
+
+        function openPeek() {
+            renderPreview();
+            document.getElementById("peekOverlay").classList.add("active");
+            setTimeout(() => fitPageToFrame("peekFrame", "cvPeek", getContainerSize("peek-stage", 40)), 60);
+        }
+
+        function closePeek() { document.getElementById("peekOverlay").classList.remove("active") }
+
+        window.addEventListener("beforeunload", save);
+
+        // Initial render
+        rerenderForm();
+    </script>
+</body>
+</html>
