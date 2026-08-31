@@ -322,6 +322,13 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px
         }
+        /* Language fields (Reading/Writing/Speaking, plus the language name) are all
+           short values — keep them two per row even on narrow screens. */
+        .lang-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
         .repeat {
             border: 1px solid #e3e8ee;
             border-radius: 10px;
@@ -362,7 +369,45 @@
         .section-tools {
             display: flex;
             gap: 7px;
+            align-items: center;
             flex-wrap: wrap;
+        }
+        .section-arrows {
+            display: flex;
+            gap: 4px;
+        }
+        .arrow-btn {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--navy);
+            border-radius: 8px;
+            width: 27px;
+            height: 27px;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+        }
+        .arrow-btn:hover:not(:disabled) {
+            background: var(--soft)
+        }
+        .arrow-btn:disabled {
+            opacity: .3;
+            cursor: default
+        }
+        .reorder-hint {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin: 2px 2px 11px;
+        }
+        .add-section-card {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 4px 0 0;
         }
         .tiny {
             border: 1px solid var(--line);
@@ -498,6 +543,16 @@
         }
         .edu-field-group:last-child {
             margin-bottom: 0;
+        }
+        /* Right-side education fields (e.g. Passing Year, GPA) are short values —
+           show them two to a row instead of stacked, on all screen sizes. */
+        .edu-right-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 10px;
+        }
+        .edu-right-fields .edu-field-group {
+            margin-bottom: 6px;
         }
         .edu-field-label {
             display: flex;
@@ -1240,37 +1295,12 @@
                     <div class="field"><label>Location</label><input id="location"></div>
                 </div>
 
-                <div class="card" id="objectiveCard">
-                    <div class="card-head"><h2>Career Objective</h2><div class="section-tools"><button class="tiny" data-clear="objective">Clear</button></div></div>
-                    <div class="field"><textarea id="objective"></textarea></div>
-                </div>
+                <div class="reorder-hint">Use ↑ / ↓ on any section below to change where it appears on the CV.</div>
+                <div id="sectionsContainer"></div>
 
-                <div class="card" id="educationCard">
-                    <div class="card-head"><h2>Academic Qualifications</h2></div>
-                    <div id="educationList"></div><button class="add" id="addEducation">＋ Add education</button>
-                </div>
-
-                <div class="card" id="skillsCard">
-                    <div class="card-head"><h2>Key Skills &amp; Strengths</h2></div>
-                    <div id="skillsList"></div><button class="add" id="addSkill">＋ Add skill</button>
-                </div>
-
-                <div class="card" id="personalCard">
-                    <div class="card-head"><h2>Personal Information</h2><button class="tiny" id="addPersonal">＋ Add field</button></div>
-                    <div id="personalList"></div>
-                </div>
-
-                <div class="card" id="languageCard">
-                    <div class="card-head"><h2>Language Proficiency</h2></div>
-                    <div id="languageList"></div><button class="add" id="addLanguage">＋ Add language</button>
-                </div>
-
-                <!-- Reference field removed -->
-
-                <div class="card">
-                    <div class="card-head"><h2>Custom Sections</h2><button class="tiny" id="addCustom">＋ Add section</button></div>
-                    <div id="customList"></div>
-                    <div class="helper">Examples: Training &amp; Certifications, Projects, Volunteer Experience, Achievements.</div>
+                <div class="card add-section-card">
+                    <button class="add" id="addCustom">＋ Add custom section</button>
+                    <div class="helper">Examples: Training &amp; Certifications, Projects, Volunteer Experience, Achievements. New sections are added at the end — use the ↑ arrow to move one up.</div>
                 </div>
 
                 <div class="card">
@@ -1326,7 +1356,7 @@
                 degree: "B.Sc. (Honours) in Mathematics — 2nd Year",
                 school: "",
                 leftFields: [{ label: "Group/Subject", value: "" }],
-                rightFields: [{ label: "Status", value: "" }]
+                rightFields: [{ label: "Status", value: "" }, { label: "CGPA", value: "" }]
             }, {
                 degree: "Higher Secondary Certificate (HSC)",
                 school: "",
@@ -1361,13 +1391,55 @@
             ],
             // reference field removed
             custom: [],
+            sectionOrder: ["objective", "education", "skills", "personal", "language"],
             declaration: "I hereby declare that the details furnished above are true and correct to the best of my knowledge and belief.",
             photoEnabled: false,
             photoData: null
         };
+        const BUILTIN_SECTIONS = ["objective", "education", "skills", "personal", "language"];
+
+        function newId(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 7) }
+
         let state = load();
+        migrateEducationFields();
+        reconcileSectionOrder();
+
+        // One-time fix-up for CVs saved before the CGPA field existed: an untouched
+        // "Status"-only right-field entry gets a CGPA field added alongside it,
+        // matching the two-field layout the other education entries already use.
+        function migrateEducationFields() {
+            state.education.forEach(e => {
+                if (e.rightFields.length === 1 && (e.rightFields[0].label || "").trim().toLowerCase() === "status") {
+                    e.rightFields.push({ label: "CGPA", value: "" });
+                }
+            });
+        }
 
         function clone(x) { return JSON.parse(JSON.stringify(x)) }
+
+        // Keeps state.sectionOrder in sync with what sections actually exist:
+        // gives every custom section a stable id, drops ids for sections that
+        // no longer exist, and appends any section that's missing from the order
+        // (e.g. right after a fresh load, or a newly added custom section).
+        function reconcileSectionOrder() {
+            state.custom.forEach(c => { if (!c.id) c.id = newId("c") });
+            const validIds = [...BUILTIN_SECTIONS, ...state.custom.map(c => c.id)];
+            const validSet = new Set(validIds);
+            if (!Array.isArray(state.sectionOrder)) state.sectionOrder = [];
+            let order = state.sectionOrder.filter(id => validSet.has(id));
+            validIds.forEach(id => { if (!order.includes(id)) order.push(id) });
+            state.sectionOrder = order;
+        }
+
+        function moveSection(id, dir) {
+            const order = state.sectionOrder;
+            const i = order.indexOf(id);
+            const j = i + dir;
+            if (i < 0 || j < 0 || j >= order.length) return;
+            [order[i], order[j]] = [order[j], order[i]];
+            rerenderForm();
+            save();
+        }
 
         function load() {
             try {
@@ -1428,47 +1500,66 @@
             let h = `<header class="cv-header"><div class="cv-photo-slot"></div><div class="cv-header-mid"><h1 class="cv-name">${esc(state.name)}</h1><div class="cv-subtitle">CURRICULUM VITAE</div><div class="cv-contact">
  ${has(state.phone)?`<span>☎ ${esc(state.phone)}</span>`:""}${has(state.email)?`<span>✉ ${esc(state.email)}</span>`:""}${has(state.location)?`<span>⌖ ${esc(state.location)}</span>`:""}
  </div></div><div class="cv-photo-slot">${photoHtml}</div></header><div class="cv-divider"></div>`;
-            if (has(state.objective)) h += cvSection("CAREER OBJECTIVE", "objective", `<p>${esc(state.objective)}</p>`);
+            // Each builder returns the section's HTML, or "" if there's nothing to show.
+            const sectionBuilders = {
+                objective: () => has(state.objective) ? cvSection("CAREER OBJECTIVE", "objective", `<p>${esc(state.objective)}</p>`) : "",
+                education: () => {
+                    const ed = state.education.filter(e => has(e.degree) || has(e.school) || e.leftFields.some(f => has(f.value)) || e
+                        .rightFields.some(f => has(f.value)));
+                    if (!ed.length) return "";
+                    const edHtml = ed.map(e => {
+                        // Left fields: each on its own line
+                        let leftHtml = e.leftFields.filter(f => has(f.value))
+                            .map(f => `<div class="field-item"><span class="field-label">${esc(f.label)}:</span> ${esc(f.value)}</div>`)
+                            .join("");
+                        // Right fields: combined into a single line with " | "
+                        const rightItems = e.rightFields.filter(f => has(f.value))
+                            .map(f => `<span><span class="field-label">${esc(f.label)}</span>: ${esc(f.value)}</span>`);
+                        let rightHtml = rightItems.length ? rightItems.join(' | ') : '';
+                        return `<article class="cv-edu">
+                                    ${has(e.degree)?`<h3 class="cv-degree">${esc(e.degree)}</h3>`:""}
+                                    ${has(e.school)?`<p class="cv-school">${esc(e.school)}</p>`:""}
+                                    <div class="cv-meta">
+                                        <div class="left-fields">${leftHtml}</div>
+                                        <div class="right-fields">${rightHtml}</div>
+                                    </div>
+                                </article>`;
+                    }).join("");
+                    return cvSection("ACADEMIC QUALIFICATIONS", "education", edHtml);
+                },
+                skills: () => {
+                    const sk = state.skills.filter(has);
+                    if (!sk.length) return "";
+                    return cvSection("KEY SKILLS & STRENGTHS", "skills",
+                        `<div class="cv-skill"><ul>${sk.map(x=>{const i=x.indexOf(":");return i>-1?`<li><strong>${esc(x.slice(0,i+1))}</strong>${esc(x.slice(i+1))}</li>`:`<li>${esc(x)}</li>`}).join("")}</ul></div>`
+                        );
+                },
+                personal: () => {
+                    const pi = state.personal.filter(p => has(p[0]) || has(p[1]));
+                    if (!pi.length) return "";
+                    return cvSection("PERSONAL INFORMATION", "personal",
+                        `<div class="cv-personal">${pi.map(p=>`<b>${esc(p[0])}</b><span>${esc(p[1])}</span>`).join("")}</div>`);
+                },
+                language: () => {
+                    const lg = state.languages.filter(l => has(l.name) || has(l.reading) || has(l.writing) || has(l.speaking));
+                    if (!lg.length) return "";
+                    return cvSection("LANGUAGE PROFICIENCY", "language",
+                        `<div class="cv-languages">${lg.map(l=>`<p><strong>${esc(l.name)}:</strong> Reading — ${esc(l.reading)} | Writing — ${esc(l.writing)} | Speaking — ${esc(l.speaking)}</p>`).join("")}</div>`
+                        );
+                }
+            };
 
-            // Education
-            const ed = state.education.filter(e => has(e.degree) || has(e.school) || e.leftFields.some(f => has(f.value)) || e
-                .rightFields.some(f => has(f.value)));
-            if (ed.length) {
-                const edHtml = ed.map(e => {
-                    // Left fields: each on its own line
-                    let leftHtml = e.leftFields.filter(f => has(f.label) || has(f.value))
-                        .map(f => `<div class="field-item"><span class="field-label">${esc(f.label)}:</span> ${esc(f.value)}</div>`)
-                        .join("");
-                    // Right fields: combined into a single line with " | "
-                    const rightItems = e.rightFields.filter(f => has(f.label) || has(f.value))
-                        .map(f => `<span><span class="field-label">${esc(f.label)}</span>: ${esc(f.value)}</span>`);
-                    let rightHtml = rightItems.length ? rightItems.join(' | ') : '';
-                    return `<article class="cv-edu">
-                                ${has(e.degree)?`<h3 class="cv-degree">${esc(e.degree)}</h3>`:""}
-                                ${has(e.school)?`<p class="cv-school">${esc(e.school)}</p>`:""}
-                                <div class="cv-meta">
-                                    <div class="left-fields">${leftHtml}</div>
-                                    <div class="right-fields">${rightHtml}</div>
-                                </div>
-                            </article>`;
-                }).join("");
-                h += cvSection("ACADEMIC QUALIFICATIONS", "education", edHtml);
-            }
+            state.sectionOrder.forEach(id => {
+                if (sectionBuilders[id]) {
+                    h += sectionBuilders[id]();
+                } else {
+                    const c = state.custom.find(x => x.id === id);
+                    if (c && has(c.title) && has(c.text)) {
+                        h += cvSection(c.title, "custom", `<p style="padding-left:34px">${esc(c.text).replace(/\n/g,"<br>")}</p>`);
+                    }
+                }
+            });
 
-            const sk = state.skills.filter(has);
-            if (sk.length) h += cvSection("KEY SKILLS & STRENGTHS", "skills",
-                `<div class="cv-skill"><ul>${sk.map(x=>{const i=x.indexOf(":");return i>-1?`<li><strong>${esc(x.slice(0,i+1))}</strong>${esc(x.slice(i+1))}</li>`:`<li>${esc(x)}</li>`}).join("")}</ul></div>`
-                );
-            const pi = state.personal.filter(p => has(p[0]) || has(p[1]));
-            if (pi.length) h += cvSection("PERSONAL INFORMATION", "personal",
-                `<div class="cv-personal">${pi.map(p=>`<b>${esc(p[0])}</b><span>${esc(p[1])}</span>`).join("")}</div>`);
-            const lg = state.languages.filter(l => has(l.name) || has(l.reading) || has(l.writing) || has(l.speaking));
-            if (lg.length) h += cvSection("LANGUAGE PROFICIENCY", "language",
-                `<div class="cv-languages">${lg.map(l=>`<p><strong>${esc(l.name)}:</strong> Reading — ${esc(l.reading)} | Writing — ${esc(l.writing)} | Speaking — ${esc(l.speaking)}</p>`).join("")}</div>`
-                );
-            // Reference section removed
-            state.custom.filter(x => has(x.title) && has(x.text)).forEach(x => h += cvSection(x.title, "custom",
-                `<p style="padding-left:34px">${esc(x.text).replace(/\n/g,"<br>")}</p>`));
             h +=
             `<div class="cv-declaration"><div class="cv-declaration-title">DECLARATION</div><div class="cv-declaration-text">${esc(state.declaration)}</div><div class="cv-signature"><div class="cv-sign-item">Date<span class="cv-dots"></span></div><div class="cv-sign-item">Signature<span class="cv-dots"></span></div></div></div>`;
             return h;
@@ -1573,16 +1664,139 @@
             field("phone", "phone");
             field("email", "email");
             field("location", "location");
-            field("objective", "objective");
-            // reference field removed
             field("declaration", "declaration");
+            renderSections();
+            syncPhotoUI();
+            renderPreview();
+        }
+
+        // ---------- Section markup for the five built-in sections ----------
+        function sectionCardHtml(id) {
+            if (id === "objective") {
+                return `<div class="card" data-section="objective">
+                    <div class="card-head"><h2>Career Objective</h2>
+                        <div class="section-tools">
+                            <div class="section-arrows"><button class="arrow-btn" data-move="up" title="Move up">↑</button><button class="arrow-btn" data-move="down" title="Move down">↓</button></div>
+                            <button class="tiny" data-clear="objective">Clear</button>
+                        </div>
+                    </div>
+                    <div class="field"><textarea id="objective"></textarea></div>
+                </div>`;
+            }
+            if (id === "education") {
+                return `<div class="card" data-section="education">
+                    <div class="card-head"><h2>Academic Qualifications</h2>
+                        <div class="section-arrows"><button class="arrow-btn" data-move="up" title="Move up">↑</button><button class="arrow-btn" data-move="down" title="Move down">↓</button></div>
+                    </div>
+                    <div id="educationList"></div><button class="add" id="addEducation">＋ Add education</button>
+                </div>`;
+            }
+            if (id === "skills") {
+                return `<div class="card" data-section="skills">
+                    <div class="card-head"><h2>Key Skills &amp; Strengths</h2>
+                        <div class="section-arrows"><button class="arrow-btn" data-move="up" title="Move up">↑</button><button class="arrow-btn" data-move="down" title="Move down">↓</button></div>
+                    </div>
+                    <div id="skillsList"></div><button class="add" id="addSkill">＋ Add skill</button>
+                    <div class="helper">The title appears in bold on your CV, followed by a colon and the description. Leave the title blank for a plain skill line.</div>
+                </div>`;
+            }
+            if (id === "personal") {
+                return `<div class="card" data-section="personal">
+                    <div class="card-head"><h2>Personal Information</h2>
+                        <div class="section-tools">
+                            <div class="section-arrows"><button class="arrow-btn" data-move="up" title="Move up">↑</button><button class="arrow-btn" data-move="down" title="Move down">↓</button></div>
+                            <button class="tiny" id="addPersonal">＋ Add field</button>
+                        </div>
+                    </div>
+                    <div id="personalList"></div>
+                </div>`;
+            }
+            if (id === "language") {
+                return `<div class="card" data-section="language">
+                    <div class="card-head"><h2>Language Proficiency</h2>
+                        <div class="section-arrows"><button class="arrow-btn" data-move="up" title="Move up">↑</button><button class="arrow-btn" data-move="down" title="Move down">↓</button></div>
+                    </div>
+                    <div id="languageList"></div><button class="add" id="addLanguage">＋ Add language</button>
+                </div>`;
+            }
+            // Custom section
+            const c = state.custom.find(x => x.id === id);
+            if (!c) return "";
+            const num = state.custom.findIndex(x => x.id === id) + 1;
+            return `<div class="card" data-section="${id}">
+                <div class="card-head"><h2>Custom Section ${num}</h2>
+                    <div class="section-tools">
+                        <div class="section-arrows"><button class="arrow-btn" data-move="up" title="Move up">↑</button><button class="arrow-btn" data-move="down" title="Move down">↓</button></div>
+                        <button class="tiny remove-custom" title="Remove section">✕</button>
+                    </div>
+                </div>
+                <div class="field"><label>Section title</label><input class="custom-title" value="${esc(c.title)}"></div>
+                <div class="field"><label>Information</label><textarea class="custom-text">${esc(c.text)}</textarea></div>
+            </div>`;
+        }
+
+        // Rebuilds all reorderable sections (built-in + custom) in state.sectionOrder,
+        // then wires up their controls — since the whole container is rebuilt each time.
+        function renderSections() {
+            const box = document.getElementById("sectionsContainer");
+            box.innerHTML = state.sectionOrder.map(sectionCardHtml).join("");
+
+            box.querySelectorAll("[data-section]").forEach(card => {
+                const id = card.dataset.section;
+                const idx = state.sectionOrder.indexOf(id);
+                const upBtn = card.querySelector('[data-move="up"]');
+                const downBtn = card.querySelector('[data-move="down"]');
+                if (upBtn) { upBtn.disabled = idx === 0; upBtn.onclick = () => moveSection(id, -1) }
+                if (downBtn) { downBtn.disabled = idx === state.sectionOrder.length - 1; downBtn.onclick = () => moveSection(id, 1) }
+            });
+
+            box.querySelectorAll("[data-clear]").forEach(b => b.onclick = () => { state[b.dataset.clear] = "";
+                rerenderForm();
+                save() });
+
+            document.getElementById("addEducation").onclick = () => {
+                state.education.push({
+                    degree: "",
+                    school: "",
+                    leftFields: [{ label: "Label", value: "" }],
+                    rightFields: [{ label: "Label", value: "" }]
+                });
+                rerenderForm();
+                save();
+            };
+            document.getElementById("addSkill").onclick = () => { state.skills.push("");
+                rerenderForm();
+                save() };
+            document.getElementById("addPersonal").onclick = () => { state.personal.push(["", ""]);
+                rerenderForm();
+                save() };
+            document.getElementById("addLanguage").onclick = () => { state.languages.push({ name: "", reading: "", writing: "",
+                    speaking: "" });
+                rerenderForm();
+                save() };
+
+            state.custom.forEach(c => {
+                const card = box.querySelector(`[data-section="${c.id}"]`);
+                if (!card) return;
+                card.querySelector(".custom-title").oninput = e => { c.title = e.target.value;
+                    renderPreview();
+                    save() };
+                card.querySelector(".custom-text").oninput = e => { c.text = e.target.value;
+                    renderPreview();
+                    save() };
+                card.querySelector(".remove-custom").onclick = () => {
+                    state.custom = state.custom.filter(x => x.id !== c.id);
+                    state.sectionOrder = state.sectionOrder.filter(x => x !== c.id);
+                    rerenderForm();
+                    save();
+                };
+            });
+
+            field("objective", "objective");
             renderEducation();
             renderSkills();
             renderPersonal();
             renderLanguages();
-            renderCustom();
-            syncPhotoUI();
-            renderPreview();
         }
 
         // ---------- Education rendering (no delete buttons) ----------
@@ -1707,17 +1921,40 @@
         }
 
         // ---------- Other render functions ----------
+        // A skill is stored as one string, "Title: description" (or just "description"
+        // if there's no title) — these two helpers convert to/from that format so the
+        // form can show title and description as separate fields without changing
+        // storage or CV output at all.
+        function splitSkill(s) {
+            const i = s.indexOf(":");
+            if (i === -1) return { title: "", desc: s };
+            return { title: s.slice(0, i).trim(), desc: s.slice(i + 1).trim() };
+        }
+
+        function joinSkill(title, desc) {
+            title = title.trim();
+            if (!title) return desc;
+            return desc ? `${title}: ${desc}` : `${title}:`;
+        }
+
         function renderSkills() {
             const box = document.getElementById("skillsList");
             box.innerHTML = "";
             state.skills.forEach((s, i) => {
+                const { title, desc } = splitSkill(s);
                 const d = document.createElement("div");
                 d.className = "repeat";
                 d.innerHTML =
-                    `<div class="repeat-head"><strong>Skill ${i+1}</strong><button class="remove">✕</button></div><textarea>${esc(s)}</textarea>`;
-                d.querySelector("textarea").oninput = e => { state.skills[i] = e.target.value;
+                    `<div class="repeat-head"><strong>Skill ${i+1}</strong><button class="remove">✕</button></div>
+                    <div class="field"><label>Skill title</label><input class="skill-title" placeholder="e.g. Microsoft Office" value="${esc(title)}"></div>
+                    <div class="field"><label>Description</label><textarea class="skill-desc" placeholder="e.g. Proficient in MS Word and Excel">${esc(desc)}</textarea></div>`;
+                const titleInput = d.querySelector(".skill-title");
+                const descInput = d.querySelector(".skill-desc");
+                const sync = () => { state.skills[i] = joinSkill(titleInput.value, descInput.value);
                     renderPreview();
                     save() };
+                titleInput.oninput = sync;
+                descInput.oninput = sync;
                 d.querySelector(".remove").onclick = () => { state.skills.splice(i, 1);
                     rerenderForm();
                     save() };
@@ -1754,35 +1991,13 @@
             state.languages.forEach((l, i) => {
                 const d = document.createElement("div");
                 d.className = "repeat";
-                d.innerHTML = `<div class="repeat-head"><strong>Language ${i+1}</strong><button class="remove">✕</button></div><div class="row2">
+                d.innerHTML = `<div class="repeat-head"><strong>Language ${i+1}</strong><button class="remove">✕</button></div><div class="lang-grid">
    <div class="field"><label>Language</label><input data-k="name" value="${esc(l.name)}"></div><div class="field"><label>Reading</label><input data-k="reading" value="${esc(l.reading)}"></div>
    <div class="field"><label>Writing</label><input data-k="writing" value="${esc(l.writing)}"></div><div class="field"><label>Speaking</label><input data-k="speaking" value="${esc(l.speaking)}"></div></div>`;
                 d.querySelectorAll("input").forEach(x => x.oninput = () => { l[x.dataset.k] = x.value;
                     renderPreview();
                     save() });
                 d.querySelector(".remove").onclick = () => { state.languages.splice(i, 1);
-                    rerenderForm();
-                    save() };
-                box.appendChild(d);
-            });
-        }
-
-        function renderCustom() {
-            const box = document.getElementById("customList");
-            box.innerHTML = "";
-            state.custom.forEach((x, i) => {
-                const d = document.createElement("div");
-                d.className = "repeat";
-                d.innerHTML = `<div class="repeat-head"><strong>Custom section ${i+1}</strong><button class="remove">✕</button></div>
-   <div class="field"><label>Section title</label><input value="${esc(x.title)}"></div><div class="field"><label>Information</label><textarea>${esc(x.text)}</textarea></div>`;
-                const inputs = d.querySelectorAll("input,textarea");
-                inputs[0].oninput = e => { x.title = e.target.value;
-                    renderPreview();
-                    save() };
-                inputs[1].oninput = e => { x.text = e.target.value;
-                    renderPreview();
-                    save() };
-                d.querySelector(".remove").onclick = () => { state.custom.splice(i, 1);
                     rerenderForm();
                     save() };
                 box.appendChild(d);
@@ -1878,32 +2093,16 @@
         document.getElementById("checkList").onclick = e => { const b = e.target.closest("[data-fix]");
             if (b) show("formScreen") };
 
-        document.getElementById("addEducation").onclick = () => {
-            state.education.push({
-                degree: "",
-                school: "",
-                leftFields: [{ label: "Label", value: "" }],
-                rightFields: [{ label: "Label", value: "" }]
-            });
+        // addEducation / addSkill / addPersonal / addLanguage / [data-clear] buttons live inside
+        // #sectionsContainer, which is rebuilt on every rerenderForm() — so they're bound inside
+        // renderSections() instead of here. addCustom is a static button outside that container.
+        document.getElementById("addCustom").onclick = () => {
+            const id = newId("c");
+            state.custom.push({ id, title: "", text: "" });
+            state.sectionOrder.push(id);
             rerenderForm();
             save();
         };
-        document.getElementById("addSkill").onclick = () => { state.skills.push("");
-            rerenderForm();
-            save() };
-        document.getElementById("addPersonal").onclick = () => { state.personal.push(["", ""]);
-            rerenderForm();
-            save() };
-        document.getElementById("addLanguage").onclick = () => { state.languages.push({ name: "", reading: "", writing: "",
-                speaking: "" });
-            rerenderForm();
-            save() };
-        document.getElementById("addCustom").onclick = () => { state.custom.push({ title: "", text: "" });
-            rerenderForm();
-            save() };
-        document.querySelectorAll("[data-clear]").forEach(b => b.onclick = () => { state[b.dataset.clear] = "";
-            rerenderForm();
-            save() });
 
         // ---- Reset button ----
         document.getElementById("resetBtn").onclick = function() {
