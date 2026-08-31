@@ -1843,7 +1843,7 @@
         // ---- Download PDF with dynamic filename ----
         document.getElementById("downloadBtn").onclick = function() {
             const name = state.name.trim();
-            const baseName = name ? `cvof${name}` : 'cv';
+            const baseName = name ? `CV-${name}` : 'CV';
             // Set document title to influence the default PDF filename
             const originalTitle = document.title;
             document.title = baseName;
